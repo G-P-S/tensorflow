@@ -32,13 +32,6 @@ INCLUDES := \
 -I. \
 -I$(MAKEFILE_DIR)/../../../../../ \
 -I$(MAKEFILE_DIR)/../../../../../../ \
--I$(MAKEFILE_DIR)/downloads/ \
--I$(MAKEFILE_DIR)/downloads/eigen \
--I$(MAKEFILE_DIR)/downloads/absl \
--I$(MAKEFILE_DIR)/downloads/gemmlowp \
--I$(MAKEFILE_DIR)/downloads/neon_2_sse \
--I$(MAKEFILE_DIR)/downloads/farmhash/src \
--I$(MAKEFILE_DIR)/downloads/flatbuffers/include \
 -I$(OBJDIR)
 # This is at the end so any globally-installed frameworks like protobuf don't
 # override local versions in the source tree.
@@ -109,13 +102,7 @@ $(wildcard tensorflow/lite/kernels/*.cc) \
 $(wildcard tensorflow/lite/kernels/internal/*.cc) \
 $(wildcard tensorflow/lite/kernels/internal/optimized/*.cc) \
 $(wildcard tensorflow/lite/kernels/internal/reference/*.cc) \
-$(PROFILER_SRCS) \
-tensorflow/lite/tools/make/downloads/farmhash/src/farmhash.cc \
-tensorflow/lite/tools/make/downloads/fft2d/fftsg.c \
-tensorflow/lite/tools/make/downloads/flatbuffers/src/util.cpp
-CORE_CC_ALL_SRCS += \
-	$(shell find tensorflow/lite/tools/make/downloads/absl/absl/ \
-	             -type f -name \*.cc | grep -v test | grep -v benchmark | grep -v synchronization | grep -v debugging)
+$(PROFILER_SRCS)
 endif
 # Remove any duplicates.
 CORE_CC_ALL_SRCS := $(sort $(CORE_CC_ALL_SRCS))
