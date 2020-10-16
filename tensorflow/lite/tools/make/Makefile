@@ -32,15 +32,6 @@ INCLUDES := \
 -I. \
 -I$(MAKEFILE_DIR)/../../../../../ \
 -I$(MAKEFILE_DIR)/../../../../../../ \
--I$(MAKEFILE_DIR)/downloads/ \
--I$(MAKEFILE_DIR)/downloads/eigen \
--I$(MAKEFILE_DIR)/downloads/absl \
--I$(MAKEFILE_DIR)/downloads/gemmlowp \
--I$(MAKEFILE_DIR)/downloads/ruy \
--I$(MAKEFILE_DIR)/downloads/neon_2_sse \
--I$(MAKEFILE_DIR)/downloads/farmhash/src \
--I$(MAKEFILE_DIR)/downloads/flatbuffers/include \
--I$(MAKEFILE_DIR)/downloads/fp16/include \
 -I$(OBJDIR)
 # This is at the end so any globally-installed frameworks like protobuf don't
 # override local versions in the source tree.
@@ -126,8 +117,7 @@ $(wildcard tensorflow/lite/c/*.c) \
 $(wildcard tensorflow/lite/c/*.cc) \
 $(wildcard tensorflow/lite/core/*.cc) \
 $(wildcard tensorflow/lite/core/api/*.cc) \
-$(wildcard tensorflow/lite/experimental/resource/*.cc) \
-$(wildcard tensorflow/lite/tools/make/downloads/ruy/ruy/*.cc)
+$(wildcard tensorflow/lite/experimental/resource/*.cc)
 ifneq ($(BUILD_TYPE),micro)
 CORE_CC_ALL_SRCS += \
 $(wildcard tensorflow/lite/kernels/*.cc) \
@@ -135,14 +125,7 @@ $(wildcard tensorflow/lite/kernels/internal/*.cc) \
 $(wildcard tensorflow/lite/kernels/internal/optimized/*.cc) \
 $(wildcard tensorflow/lite/kernels/internal/reference/*.cc) \
 $(wildcard tensorflow/lite/tools/optimize/sparsity/*.cc) \
-$(PROFILER_SRCS) \
-tensorflow/lite/tools/make/downloads/farmhash/src/farmhash.cc \
-tensorflow/lite/tools/make/downloads/fft2d/fftsg.c \
-tensorflow/lite/tools/make/downloads/fft2d/fftsg2d.c \
-tensorflow/lite/tools/make/downloads/flatbuffers/src/util.cpp
-CORE_CC_ALL_SRCS += \
-	$(shell find tensorflow/lite/tools/make/downloads/absl/absl/ \
-	             -type f -name \*.cc | grep -v test | grep -v benchmark | grep -v synchronization | grep -v debugging | grep -v hash | grep -v flags | grep -v random)
+$(PROFILER_SRCS)
 endif
 # Remove any duplicates.
 CORE_CC_ALL_SRCS := $(sort $(CORE_CC_ALL_SRCS))
@@ -192,9 +175,6 @@ endif
 
 BUILD_WITH_RUY_PROFILER ?= false
 ifeq ($(BUILD_WITH_RUY_PROFILER),true)
-  CORE_CC_ALL_SRCS += tensorflow/lite/tools/make/downloads/ruy/ruy/profiler/instrumentation.cc
-  CORE_CC_ALL_SRCS += tensorflow/lite/tools/make/downloads/ruy/ruy/profiler/profiler.cc
-  CORE_CC_ALL_SRCS += tensorflow/lite/tools/make/downloads/ruy/ruy/profiler/treeview.cc
   CXXFLAGS += -DRUY_PROFILER
 endif
 
@@ -220,10 +200,6 @@ else
 	CORE_CC_EXCLUDE_SRCS += tensorflow/lite/minimal_logging_android.cc
 	CORE_CC_EXCLUDE_SRCS += tensorflow/lite/minimal_logging_ios.cc
 endif
-
-# Temporary fix for ruy compilation error.
-# TODO(b/158800055): Remove this hack once the ruy version is correctly bumped.
-CORE_CC_EXCLUDE_SRCS += tensorflow/lite/tools/make/downloads/ruy/ruy/prepare_packed_matrices.cc
 
 # Filter out all the excluded files.
 TF_LITE_CC_SRCS := $(filter-out $(CORE_CC_EXCLUDE_SRCS), $(CORE_CC_ALL_SRCS))
